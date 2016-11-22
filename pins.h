@@ -41,8 +41,19 @@ typedef enum {
 	p29 = P0_5,
 	p30 = P0_4,
 
-	UART_TX = P0_2,
-	UART_RX = P0_3,
+//	UART_TX = P0_2,
+//	UART_RX = P0_3,
+
+	UART_TX = P4_28, // cnc4nf-mb rev. 1.1
+	UART_RX = P4_29,
+
+    CNC4NF_U3_CLOCK     = P0_11, // cnc4nf-mb rev. 1.1 74HC595 mpxer
+    CNC4NF_U3_DATA      = P2_12,
+    CNC4NF_U3_LOAD_DATA = P2_13,
+
+    CNC4NF_Q9 =  P1_20,
+    CNC4NF_Q15 = P2_4,
+    CNC4NF_Q13 = P2_6,
 
 	LED1 = P1_18,
 	LED2 = P1_19,

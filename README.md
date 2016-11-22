@@ -16,7 +16,7 @@ These are the quick steps to get the bootloader installed on your cnc4nf-mb rev.
 ##### Recommended method
 Use a JTAG debugger (for example the SEGGER JLink or any other JTAG adapter) to flash the bootloader binary to your cnc4nf-mb board at address 0x00000. There is a standard 20 pin JTAG connector on the board (the connector is approx. in the middle of the board, you cannot miss it).
 
-The original firmware will be deleted if you flash the bootloader. In oder to be able to restore the original fabbster firmware you should save the flash locations 0x00000 to 0x80000 (512k) to a file before flashing the Smoothie bootloader.
+The original firmware will be deleted if you flash the bootloader. In order to be able to restore the original fabbster firmware you should save the flash locations 0x00000 to 0x80000 (512k) to a file before flashing the Smoothie bootloader.
 
 The bootloader binary can be found in the FirmwareBin directory.
 
@@ -28,9 +28,9 @@ Alternatively you can use the LPC1768 ISP via UART0. You need to remove R91 and 
 ### Flashing the Smoothie Firmware
 
 The ported Smoothieware that runs on the fabbster board can be found here:  
-https://github.com/acurana/Smoothieware
+https://github.com/acurana/Smoothieware/tree/port/fabbster-board-rev-1.1
 
 After installing the bootloader the firmware can be placed on the SD card as outlined here:  
 http://smoothieware.org/flashing-smoothie-firmware
 
-Do not forget to put the new config file on the SD-card as well.
+Do not forget to put the fabbster config file on the SD-card as well. It can be found in the ConfigSamples/fabbsterG directory of the Smoothieware fabbster-board-rev-1.1 branch.
