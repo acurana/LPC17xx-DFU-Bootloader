@@ -2,7 +2,9 @@
 #
 #
 
-APPBAUD  = 2000000
+#APPBAUD  = 2000000
+# cnc4nf-mb rev. 1.1
+APPBAUD  = 115200
 
 PROJECT  = DFU-Bootloader
 
@@ -99,7 +101,9 @@ upload: program
 # 	@$(SIZE) $<
 size: $(OUTDIR)/$(PROJECT).elf
 	@echo
-	@echo $$'           \033[1;4m  SIZE        LPC1769         (bootloader)\033[0m'
+#	@echo $$'           \033[1;4m  SIZE        LPC1769         (bootloader)\033[0m'
+# cnc4nf-mb rev. 1.1
+	@echo $$'           \033[1;4m  SIZE        LPC1768         (bootloader)\033[0m'
 	@$(OBJDUMP) -h $^ | perl -MPOSIX -ne '/.(text|rodata)\s+([0-9a-f]+)/ && do { $$a += eval "0x$$2" }; END { printf "  FLASH    %6d bytes  %2d%% of %3dkb    %2d%% of %3dkb\n", $$a, ceil($$a * 100 / (512 * 1024)), 512, ceil($$a * 100 / (16 * 1024)), 16 }'
 	@$(OBJDUMP) -h $^ | perl -MPOSIX -ne '/.(data|bss)\s+([0-9a-f]+)/    && do { $$a += eval "0x$$2" }; END { printf "  RAM      %6d bytes  %2d%% of %3dkb\n", $$a, ceil($$a * 100 / ( 16 * 1024)),  16 }'
 
