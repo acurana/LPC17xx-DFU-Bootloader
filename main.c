@@ -6,6 +6,7 @@
  *                                                                            *
  *                                                                            *
  * This firmware is Copyright (C) 2009-2010 Michael Moon aka Triffid_Hunter   *
+ * fabbster cnc4nf-mb rev. 1.1 port Copyright (C) 2016 Christopher Lang       *
  *                                                                            *
  * This program is free software; you can redistribute it and/or modify       *
  * it under the terms of the GNU General Public License as published by       *
@@ -43,7 +44,8 @@
 
 #include "lpc17xx_wdt.h"
 
-#define ISP_BTN	P2_12
+//#define ISP_BTN	P2_12
+#define ISP_BTN   P2_11 // cnc4nf-mb rev. 1.1
 
 #if !(defined DEBUG)
 #define printf(...) do {} while (0)
@@ -55,13 +57,51 @@ FIL		file;
 const char *firmware_file = "firmware.bin";
 const char *firmware_old  = "firmware.cur";
 
+/*
+ * fabbster cnc4nf-mb board U3 74HC595 multiplexer pins
+ */
+typedef enum {
+    CNC4NF_U3_LED1   = 0x01,
+    CNC4NF_U3_LED2   = 0x02,
+    CNC4NF_U3_LED3   = 0x04,
+    CNC4NF_U3_LEDQ11 = 0x08,
+    CNC4NF_U3_LEDQ1  = 0x10,
+    CNC4NF_U3_LEDQ3  = 0x20,
+    CNC4NF_U3_LEDQ5  = 0x40,
+    CNC4NF_U3_LEDQ7  = 0x80,
+}
+cnc4nf_u3_t;
+
+/*
+ * fabbster cnc4nf-mb U3 74HC595 output serial shift register 8 bit data cache
+ */
+static uint8_t cnc4nf_mb_u3_data;
+
 void setleds(int leds)
 {
-	GPIO_write(LED1, leds &  1);
-	GPIO_write(LED2, leds &  2);
-	GPIO_write(LED3, leds &  4);
-	GPIO_write(LED4, leds &  8);
-	GPIO_write(LED5, leds & 16);
+//	GPIO_write(LED1, leds &  1);
+//	GPIO_write(LED2, leds &  2);
+//	GPIO_write(LED3, leds &  4);
+//	GPIO_write(LED4, leds &  8);
+//	GPIO_write(LED5, leds & 16);
+
+	// cnc4nf-mb rev. 1.1, LEDs are inverted
+    if (leds & 0x01)
+        cnc4nf_mb_u3_data &= ~CNC4NF_U3_LED1;
+    else
+        cnc4nf_mb_u3_data |= CNC4NF_U3_LED1;
+
+    if (leds & 0x02)
+        cnc4nf_mb_u3_data &= ~CNC4NF_U3_LED2;
+    else
+        cnc4nf_mb_u3_data |= CNC4NF_U3_LED2;
+
+    if (leds & 0x04)
+        cnc4nf_mb_u3_data &= ~CNC4NF_U3_LED3;
+    else
+        cnc4nf_mb_u3_data |= CNC4NF_U3_LED3;
+
+    cnc4nf_set_u3(cnc4nf_mb_u3_data);
 }
 
 int isp_btn_pressed()
@@ -168,33 +208,89 @@ static void new_execute_user_code(void)
 	boot(addr);
 }
 
+/*
+ * fabbster cnc4nf-mb U3: LED & Q outputs
+ */
+void cnc4nf_set_u3(uint8_t bits)
+{
+    int i;
+
+    for (i=7; i >= 0; --i)
+    {
+        GPIO_write(CNC4NF_U3_DATA, cnc4nf_mb_u3_data & (0x01 << i)); // highest bit is shifted in 1st
+        GPIO_write(CNC4NF_U3_CLOCK, 1); // clock next data bit to data pin
+        GPIO_write(CNC4NF_U3_CLOCK, 0);
+    }
+    GPIO_write(CNC4NF_U3_LOAD_DATA, 1); // make data appear on outputs
+    GPIO_write(CNC4NF_U3_LOAD_DATA, 0);
+}
+
+/*
+ * initialise fabbster cnc4nf-mb board multiplexer & ports
+ */
+void cnc4nf_init(void)
+{
+    /*
+     * init U3 HC595 pins
+     */
+    GPIO_init(CNC4NF_U3_CLOCK); GPIO_output(CNC4NF_U3_CLOCK);
+    GPIO_init(CNC4NF_U3_DATA); GPIO_output(CNC4NF_U3_DATA);
+    GPIO_init(CNC4NF_U3_LOAD_DATA); GPIO_output(CNC4NF_U3_LOAD_DATA);
+
+    /*
+     * set pins to initial state
+     */
+    GPIO_write(CNC4NF_U3_CLOCK, 0);
+    GPIO_write(CNC4NF_U3_DATA, 0);
+    GPIO_write(CNC4NF_U3_LOAD_DATA, 0);
+
+    /*
+     * clear data cache and shift out data
+     */
+    cnc4nf_mb_u3_data = 0xff; // all pin functions are inverted
+    cnc4nf_set_u3(cnc4nf_mb_u3_data);
+}
+
 int main()
 {
 	WDT_Feed();
 
 	GPIO_init(ISP_BTN); GPIO_input(ISP_BTN);
 
-	GPIO_init(LED1); GPIO_output(LED1);
-	GPIO_init(LED2); GPIO_output(LED2);
-	GPIO_init(LED3); GPIO_output(LED3);
-	GPIO_init(LED4); GPIO_output(LED4);
-	GPIO_init(LED5); GPIO_output(LED5);
+//	GPIO_init(LED1); GPIO_output(LED1);
+//	GPIO_init(LED2); GPIO_output(LED2);
+//	GPIO_init(LED3); GPIO_output(LED3);
+//	GPIO_init(LED4); GPIO_output(LED4);
+//	GPIO_init(LED5); GPIO_output(LED5);
+
+    // cnc4nf-mb rev. 1.1
+	cnc4nf_init();
 
 	// turn off heater outputs
-	GPIO_init(P2_4); GPIO_output(P2_4); GPIO_write(P2_4, 0);
-	GPIO_init(P2_5); GPIO_output(P2_5); GPIO_write(P2_5, 0);
-	GPIO_init(P2_6); GPIO_output(P2_6); GPIO_write(P2_6, 0);
-	GPIO_init(P2_7); GPIO_output(P2_7); GPIO_write(P2_7, 0);
+//	GPIO_init(P2_4); GPIO_output(P2_4); GPIO_write(P2_4, 0);
+//	GPIO_init(P2_5); GPIO_output(P2_5); GPIO_write(P2_5, 0);
+//	GPIO_init(P2_6); GPIO_output(P2_6); GPIO_write(P2_6, 0);
+//	GPIO_init(P2_7); GPIO_output(P2_7); GPIO_write(P2_7, 0);
+
+    // cnc4nf-mb rev. 1.1
+	GPIO_write(CNC4NF_Q9, 1); // pins are inverted, -> 1
+	GPIO_write(CNC4NF_Q15, 1);
+	GPIO_write(CNC4NF_Q13, 1);
 
 	setleds(31);
 
-	UART_init(UART_RX, UART_TX, 2000000);
-	printf("Bootloader Start\n");
+//	UART_init(UART_RX, UART_TX, 2000000);
+	UART_init(UART_RX, UART_TX, APPBAUD); // cnc4nf-mb rev. 1.1
+
+	printf("cnc4nf-mb rev. 1.1 Bootloader Start\n");
+    printf("Version 1.0.0, %s\n", __DATE__);
 
 	// give SD card time to wake up
 	for (volatile int i = (1UL<<12); i; i--);
 
-	SDCard_init(P0_9, P0_8, P0_7, P0_6);
+//	SDCard_init(P0_9, P0_8, P0_7, P0_6);
+	SDCard_init(P0_18, P0_17, P0_15, P0_16); // cnc4nf-mb rev. 1.1
+
 	if (SDCard_disk_initialize() == 0)
 		check_sd_firmware();
 
