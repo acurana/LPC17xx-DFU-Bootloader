@@ -1,7 +1,7 @@
 
 ## Overview
 
-This is a port of the Smoothieware bootloader to the fabbster cnc4nf-mb rev. 1.1 board.
+This is a port of the Smoothieware bootloader to the fabbster* cnc4nf-mb rev. 1.1 board.
 
 Smoothie is a free, opensource, high performance G-code interpreter and CNC controller written in object-oriented C++ for the LPC17xx micro-controller ( ARM Cortex M3 architecture ).
 
@@ -34,3 +34,6 @@ After installing the bootloader the firmware can be placed on the SD card as out
 http://smoothieware.org/flashing-smoothie-firmware
 
 Do not forget to put the fabbster config file on the SD-card as well. It can be found in the ConfigSamples/fabbsterG directory of the Smoothieware fabbster-board-rev-1.1 branch.
+
+
+* fabbster is a registered trademark of FIT AG
