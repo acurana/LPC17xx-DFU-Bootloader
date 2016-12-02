@@ -64,11 +64,11 @@ typedef enum {
     CNC4NF_U3_LED1   = 0x01,
     CNC4NF_U3_LED2   = 0x02,
     CNC4NF_U3_LED3   = 0x04,
-    CNC4NF_U3_LEDQ11 = 0x08,
-    CNC4NF_U3_LEDQ1  = 0x10,
-    CNC4NF_U3_LEDQ3  = 0x20,
-    CNC4NF_U3_LEDQ5  = 0x40,
-    CNC4NF_U3_LEDQ7  = 0x80,
+    CNC4NF_U3_Q11    = 0x08,
+    CNC4NF_U3_Q1     = 0x10,
+    CNC4NF_U3_Q3     = 0x20,
+    CNC4NF_U3_Q5     = 0x40,
+    CNC4NF_U3_Q7     = 0x80,
 }
 cnc4nf_u3_t;
 
