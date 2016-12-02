@@ -36,4 +36,4 @@ http://smoothieware.org/flashing-smoothie-firmware
 Do not forget to put the fabbster config file on the SD-card as well. It can be found in the ConfigSamples/fabbsterG directory of the Smoothieware fabbster-board-rev-1.1 branch.
 
 
-* fabbster is a registered trademark of FIT AG
+\* fabbster is a registered trademark of FIT AG
